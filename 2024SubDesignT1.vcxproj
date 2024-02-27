@@ -100,10 +100,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="SubDesignT1.qrc" />
+    <QtUic Include="settingdialog.ui" />
     <QtUic Include="SubDesignT1.ui" />
     <QtMoc Include="SubDesignT1.h" />
     <ClCompile Include="DataGenerator.cpp" />
     <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="settingdialog.cpp" />
     <ClCompile Include="Sorter.cpp" />
     <ClCompile Include="SubDesignT1.cpp" />
     <ClCompile Include="main.cpp" />
@@ -111,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="DataGenerator.h" />
     <ClInclude Include="FileManager.h" />
+    <QtMoc Include="settingdialog.h" />
     <ClInclude Include="Sorter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

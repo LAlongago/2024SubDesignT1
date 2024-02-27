@@ -20,7 +20,7 @@ class Sort
 public:
 	Sort(string filename);
 	void readData();
-	virtual void sort() = 0;
+	virtual long long sort() = 0;
 	vector<int> getSortedData();
 protected:
 	vector<int> data;
@@ -31,14 +31,14 @@ class ShellSort : public Sort
 {
 public:
 	ShellSort(string filename);
-	void sort();
+	long long sort();
 };
 
 class QuickSort : public Sort
 {
 public:
 	QuickSort(string filename);
-	void sort();
+	long long sort();
 private:
 	void quickSort(int left, int right);
 };
@@ -47,7 +47,7 @@ class HeapSort : public Sort
 {
 public:
 	HeapSort(string filename);
-	void sort();
+	long long sort();
 private:
 	void adjustHeap(int i, int length);
 };
@@ -56,7 +56,7 @@ class MergeSort : public Sort
 {
 public:
 	MergeSort(string filename);
-	void sort();
+	long long sort();
 private:
 	void mergeSort(int left, int right);
 	void merge(int left, int mid, int right);

@@ -18,12 +18,15 @@ public:
 
 private:
     Ui::SubDesignT1Class ui;
+    int dataSize;
+    int timeConsumed;
     string currentfd;
     string targetfd;
     vector<int> sortedData;
     void displayVectorInTextBrowser(vector<int>& sortedData, QTextBrowser* textBrowser);
 
 private slots:
+    void showSettingDialog();
     void on_Generate_triggered();
     void on_Open_triggered();
     void on_Save_triggered();

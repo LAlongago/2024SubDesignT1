@@ -14,6 +14,7 @@ using namespace std;
 class DataGenerator
 {
 public:
+	void SetSize(int n);
 	DataGenerator(int n, int range, string filename);
 	void generate();
 private:

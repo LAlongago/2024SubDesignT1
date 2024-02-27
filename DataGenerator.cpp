@@ -16,6 +16,11 @@ DataGenerator::DataGenerator(int n, int range, string filename)
 	this->filename = filename;
 }
 
+void DataGenerator::SetSize(int n)
+{
+	this->n = n;
+}
+
 void DataGenerator::generate()
 {
 	ofstream out(filename);

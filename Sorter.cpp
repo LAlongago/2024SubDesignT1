@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <chrono>
 
 using namespace std;
 
@@ -38,8 +39,9 @@ ShellSort::ShellSort(string filename) : Sort(filename)
 {
 }
 
-void ShellSort::sort()
+long long ShellSort::sort()
 {
+	auto start = chrono::high_resolution_clock::now();
 	int gap = data.size() / 2;
 	while (gap > 0)
 	{
@@ -56,15 +58,20 @@ void ShellSort::sort()
 		}
 		gap /= 2;
 	}
+	auto end = chrono::high_resolution_clock::now();
+	return chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
 QuickSort::QuickSort(string filename) : Sort(filename)
 {
 }
 
-void QuickSort::sort()
+long long QuickSort::sort()
 {
+	auto start = chrono::high_resolution_clock::now();
 	quickSort(0, data.size() - 1);
+	auto end = chrono::high_resolution_clock::now();
+	return chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
 void QuickSort::quickSort(int left, int right)
@@ -103,8 +110,9 @@ HeapSort::HeapSort(string filename) : Sort(filename)
 {
 }
 
-void HeapSort::sort()
+long long HeapSort::sort()
 {
+	auto start = chrono::high_resolution_clock::now();
 	for (int i = data.size() / 2 - 1; i >= 0; i--)
 	{
 		adjustHeap(i, data.size());
@@ -114,6 +122,8 @@ void HeapSort::sort()
 		swap(data[0], data[i]);
 		adjustHeap(0, i);
 	}
+	auto end = chrono::high_resolution_clock::now();
+	return chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
 void HeapSort::adjustHeap(int i, int length)
@@ -142,9 +152,12 @@ MergeSort::MergeSort(string filename) : Sort(filename)
 {
 }
 
-void MergeSort::sort()
+long long MergeSort::sort()
 {
+	auto start = chrono::high_resolution_clock::now();
 	mergeSort(0, data.size() - 1);
+	auto end = chrono::high_resolution_clock::now();
+	return chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
 void MergeSort::mergeSort(int left, int right)
