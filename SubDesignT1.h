@@ -24,11 +24,9 @@ private:
     string currentfd;
     string targetfd;
     vector<int> sortedData;
-    QMap<QString, long long> sortTimes;
     QChart* chart;
     QChartView* chartView;
     void displayVectorInTextBrowser(vector<int>& sortedData, QTextBrowser* textBrowser);
-    void updateChart(const QMap<QString, long long>& sortTimes);
     void updateChartData(const QString& sortName, long long timeConsumed);
 
 private slots:

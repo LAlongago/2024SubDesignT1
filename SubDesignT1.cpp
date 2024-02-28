@@ -23,7 +23,7 @@ SubDesignT1::SubDesignT1(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-	QHBoxLayout* layout = new QHBoxLayout(ui.widget);
+	QVBoxLayout* layout = new QVBoxLayout(ui.widget);
 	ui.widget->setLayout(layout); // 设置布局为水平布局
     connect(ui.ShellSort, &QPushButton::clicked, this, &SubDesignT1::on_ShellSort_clicked);
     connect(ui.QuickSort, &QPushButton::clicked, this, &SubDesignT1::on_QuickSort_clicked);
@@ -39,10 +39,12 @@ SubDesignT1::SubDesignT1(QWidget *parent)
 	currentfd = "";
 	targetfd = "";
 	sortedData = vector<int>();
-	sortTimes = QMap<QString, long long>();
 	chart = new QChart();
 	chartView = new QChartView(chart, this);
 	ui.widget->layout()->addWidget(chartView);
+
+	chart->setMargins(QMargins(0, 0, 0, 0));
+	chart->legend()->setContentsMargins(QMargins(0, 0, 0, 0));
 }
 
 SubDesignT1::~SubDesignT1()
@@ -70,7 +72,40 @@ void SubDesignT1::updateChartData(const QString& sortName, long long timeConsume
 		series->append(set);
 		chart->addSeries(series);
 
-		// 重新添加轴和重新设置轴范围可能需要在这里处理
+		// 检查是否已经添加了X轴和Y轴，如果没有，则添加
+		if (chart->axes(Qt::Horizontal).isEmpty()) 
+		{
+			QBarCategoryAxis* axisX = new QBarCategoryAxis();
+			QStringList categories;
+			// 假设您所有的排序算法名称都应该在这里列出
+			categories << "希尔排序" << "快速排序" << "堆排序" << "归并排序";
+			axisX->append(categories);
+			chart->addAxis(axisX, Qt::AlignBottom);
+			static_cast<QBarSeries*>(chart->series().first())->attachAxis(axisX);
+		}
+
+		if (chart->axes(Qt::Vertical).isEmpty()) 
+		{
+			QValueAxis* axisY = new QValueAxis();
+			axisY->setTitleText("耗时 (ms)");
+			chart->addAxis(axisY, Qt::AlignLeft);
+			static_cast<QBarSeries*>(chart->series().first())->attachAxis(axisY);
+		}
+
+		// 更新Y轴的范围以确保所有数据都可见
+		QValueAxis* axisY = static_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
+		long long maxTime = 0;
+		for (QAbstractSeries* series : chart->series()) 
+		{
+			for (QBarSet* barSet : static_cast<QBarSeries*>(series)->barSets()) 
+			{
+				for (int i = 0; i < barSet->count(); ++i) 
+				{
+					maxTime = std::max(maxTime, static_cast<long long>(barSet->at(i)));
+				}
+			}
+		}
+		axisY->setRange(0, maxTime + (maxTime * 0.1)); // 添加10%的空间以避免柱形紧贴上边界
 	}
 
 	// 更新数据
@@ -79,44 +114,6 @@ void SubDesignT1::updateChartData(const QString& sortName, long long timeConsume
 	// 重新设置图表以适应新数据
 	chart->createDefaultAxes();
 }
-
-
-void SubDesignT1::updateChart(const QMap<QString, long long>& sortTimes) 
-{
-	QBarSeries* series = new QBarSeries();
-
-	// 为每种排序算法创建一个条形集合
-	foreach(const QString & sortName, sortTimes.keys()) 
-	{
-		QBarSet* set = new QBarSet(sortName);
-		*set << sortTimes.value(sortName);
-		series->append(set);
-	}
-
-	QChart* chart = new QChart();
-	chart->addSeries(series);
-	chart->setTitle("Sort Times");
-	chart->setAnimationOptions(QChart::SeriesAnimations);
-
-	QStringList categories;
-	categories << "Sort Algorithms";
-	QBarCategoryAxis* axisX = new QBarCategoryAxis();
-	axisX->append(categories);
-	chart->addAxis(axisX, Qt::AlignBottom);
-	series->attachAxis(axisX);
-
-	QValueAxis* axisY = new QValueAxis();
-	axisY->setTitleText("Time (ms)");
-	chart->addAxis(axisY, Qt::AlignLeft);
-	series->attachAxis(axisY);
-
-	QChartView* chartView = new QChartView(chart);
-	chartView->setRenderHint(QPainter::Antialiasing);
-
-	// 将图表视图设置为主窗口中的某个容器的子项
-	ui.widget->layout()->addWidget(chartView);
-}
-
 
 void SubDesignT1::displayVectorInTextBrowser(vector<int>& sortedData, QTextBrowser* textBrowser)
 {
@@ -216,8 +213,6 @@ void SubDesignT1::on_ShellSort_clicked()
 	ui.methodText->setText("希尔排序");
 	ui.timeNumber->setText(QString::number(timeConsumed) + "ms");
 
-	sortTimes["希尔排序"] = timeConsumed;
-	//updateChart(sortTimes);
 	updateChartData("希尔排序", timeConsumed);
 }
 
@@ -231,6 +226,8 @@ void SubDesignT1::on_QuickSort_clicked()
 	statusBar()->showMessage("快速排序已完成", 2000);
 	ui.methodText->setText("快速排序");
 	ui.timeNumber->setText(QString::number(timeConsumed) + "ms");
+
+	updateChartData("快速排序", timeConsumed);
 }
 
 void SubDesignT1::on_HeapSort_clicked()
@@ -243,6 +240,8 @@ void SubDesignT1::on_HeapSort_clicked()
 	statusBar()->showMessage("堆排序已完成", 2000);
 	ui.methodText->setText("堆排序");
 	ui.timeNumber->setText(QString::number(timeConsumed) + "ms");
+
+	updateChartData("堆排序", timeConsumed);
 }
 
 void SubDesignT1::on_MergeSort_clicked()
@@ -255,4 +254,6 @@ void SubDesignT1::on_MergeSort_clicked()
 	statusBar()->showMessage("归并排序已完成", 2000);
 	ui.methodText->setText("归并排序");
 	ui.timeNumber->setText(QString::number(timeConsumed) + "ms");
+
+	updateChartData("归并排序", timeConsumed);
 }
