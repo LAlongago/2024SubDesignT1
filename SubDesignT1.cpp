@@ -8,11 +8,23 @@
 #include "qstatusbar.h"
 #include "qstring.h"
 #include "settingdialog.h"
+#include <QtCharts/QChartView>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
+
+QT_BEGIN_NAMESPACE
+class QChartView;
+class QChart;
+QT_END_NAMESPACE
 
 SubDesignT1::SubDesignT1(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+	QHBoxLayout* layout = new QHBoxLayout(ui.widget);
+	ui.widget->setLayout(layout); // 设置布局为水平布局
     connect(ui.ShellSort, &QPushButton::clicked, this, &SubDesignT1::on_ShellSort_clicked);
     connect(ui.QuickSort, &QPushButton::clicked, this, &SubDesignT1::on_QuickSort_clicked);
     connect(ui.HeapSort, &QPushButton::clicked, this, &SubDesignT1::on_HeapSort_clicked);
@@ -21,11 +33,90 @@ SubDesignT1::SubDesignT1(QWidget *parent)
     connect(ui.Open, &QAction::triggered, this, &SubDesignT1::on_Open_triggered);
     connect(ui.Save, &QAction::triggered, this, &SubDesignT1::on_Save_triggered);
 	connect(ui.Set, &QAction::triggered, this, &SubDesignT1::showSettingDialog);
+
+	dataSize = 0;
+	timeConsumed = 0;
+	currentfd = "";
+	targetfd = "";
+	sortedData = vector<int>();
+	sortTimes = QMap<QString, long long>();
+	chart = new QChart();
+	chartView = new QChartView(chart, this);
+	ui.widget->layout()->addWidget(chartView);
 }
 
 SubDesignT1::~SubDesignT1()
 {
 }
+
+void SubDesignT1::updateChartData(const QString& sortName, long long timeConsumed)
+{
+	// 查找是否已有该排序算法的数据
+	QBarSet* set = nullptr;
+	for (QAbstractSeries* series : chart->series()) {
+		QBarSeries* barSeries = static_cast<QBarSeries*>(series);
+		for (QBarSet* existingSet : barSeries->barSets()) {
+			if (existingSet->label() == sortName) {
+				set = existingSet;
+				break;
+			}
+		}
+	}
+
+	// 如果没有找到，创建新的BarSet
+	if (!set) {
+		set = new QBarSet(sortName);
+		QBarSeries* series = new QBarSeries();
+		series->append(set);
+		chart->addSeries(series);
+
+		// 重新添加轴和重新设置轴范围可能需要在这里处理
+	}
+
+	// 更新数据
+	set->append(timeConsumed);
+
+	// 重新设置图表以适应新数据
+	chart->createDefaultAxes();
+}
+
+
+void SubDesignT1::updateChart(const QMap<QString, long long>& sortTimes) 
+{
+	QBarSeries* series = new QBarSeries();
+
+	// 为每种排序算法创建一个条形集合
+	foreach(const QString & sortName, sortTimes.keys()) 
+	{
+		QBarSet* set = new QBarSet(sortName);
+		*set << sortTimes.value(sortName);
+		series->append(set);
+	}
+
+	QChart* chart = new QChart();
+	chart->addSeries(series);
+	chart->setTitle("Sort Times");
+	chart->setAnimationOptions(QChart::SeriesAnimations);
+
+	QStringList categories;
+	categories << "Sort Algorithms";
+	QBarCategoryAxis* axisX = new QBarCategoryAxis();
+	axisX->append(categories);
+	chart->addAxis(axisX, Qt::AlignBottom);
+	series->attachAxis(axisX);
+
+	QValueAxis* axisY = new QValueAxis();
+	axisY->setTitleText("Time (ms)");
+	chart->addAxis(axisY, Qt::AlignLeft);
+	series->attachAxis(axisY);
+
+	QChartView* chartView = new QChartView(chart);
+	chartView->setRenderHint(QPainter::Antialiasing);
+
+	// 将图表视图设置为主窗口中的某个容器的子项
+	ui.widget->layout()->addWidget(chartView);
+}
+
 
 void SubDesignT1::displayVectorInTextBrowser(vector<int>& sortedData, QTextBrowser* textBrowser)
 {
@@ -124,6 +215,10 @@ void SubDesignT1::on_ShellSort_clicked()
 	statusBar()->showMessage("希尔排序已完成", 2000);
 	ui.methodText->setText("希尔排序");
 	ui.timeNumber->setText(QString::number(timeConsumed) + "ms");
+
+	sortTimes["希尔排序"] = timeConsumed;
+	//updateChart(sortTimes);
+	updateChartData("希尔排序", timeConsumed);
 }
 
 void SubDesignT1::on_QuickSort_clicked()
