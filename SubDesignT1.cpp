@@ -23,15 +23,8 @@ SubDesignT1::SubDesignT1(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-	QVBoxLayout* layout = new QVBoxLayout(ui.widget);
+	QHBoxLayout* layout = new QHBoxLayout(ui.widget);
 	ui.widget->setLayout(layout); // 设置布局为水平布局
-    //connect(ui.ShellSort, &QPushButton::clicked, this, &SubDesignT1::on_ShellSort_clicked);
-    //connect(ui.QuickSort, &QPushButton::clicked, this, &SubDesignT1::on_QuickSort_clicked);
-    //connect(ui.HeapSort, &QPushButton::clicked, this, &SubDesignT1::on_HeapSort_clicked);
-    //connect(ui.MergeSort, &QPushButton::clicked, this, &SubDesignT1::on_MergeSort_clicked);
-  /*  connect(ui.Generate, &QAction::triggered, this, &SubDesignT1::on_Generate_triggered);
-    connect(ui.Open, &QAction::triggered, this, &SubDesignT1::on_Open_triggered);
-    connect(ui.Save, &QAction::triggered, this, &SubDesignT1::on_Save_triggered);*/
 	connect(ui.Set, &QAction::triggered, this, &SubDesignT1::showSettingDialog);
 
 	dataSize = 0;
@@ -91,8 +84,12 @@ void SubDesignT1::updateChartData(const QString& sortName, long long timeConsume
 			chart->addAxis(axisY, Qt::AlignLeft);
 			static_cast<QBarSeries*>(chart->series().first())->attachAxis(axisY);
 		}
+	}
 
-		// 更新Y轴的范围以确保所有数据都可见
+	// 更新数据
+	set->append(timeConsumed);
+
+	// 更新Y轴的范围以确保所有数据都可见
 		QValueAxis* axisY = static_cast<QValueAxis*>(chart->axes(Qt::Vertical).first());
 		long long maxTime = 0;
 		for (QAbstractSeries* series : chart->series()) 
@@ -106,10 +103,6 @@ void SubDesignT1::updateChartData(const QString& sortName, long long timeConsume
 			}
 		}
 		axisY->setRange(0, maxTime + (maxTime * 0.1)); // 添加10%的空间以避免柱形紧贴上边界
-	}
-
-	// 更新数据
-	set->append(timeConsumed);
 
 	// 重新设置图表以适应新数据
 	chart->createDefaultAxes();
