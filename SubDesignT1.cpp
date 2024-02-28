@@ -25,13 +25,13 @@ SubDesignT1::SubDesignT1(QWidget *parent)
     ui.setupUi(this);
 	QVBoxLayout* layout = new QVBoxLayout(ui.widget);
 	ui.widget->setLayout(layout); // 设置布局为水平布局
-    connect(ui.ShellSort, &QPushButton::clicked, this, &SubDesignT1::on_ShellSort_clicked);
-    connect(ui.QuickSort, &QPushButton::clicked, this, &SubDesignT1::on_QuickSort_clicked);
-    connect(ui.HeapSort, &QPushButton::clicked, this, &SubDesignT1::on_HeapSort_clicked);
-    connect(ui.MergeSort, &QPushButton::clicked, this, &SubDesignT1::on_MergeSort_clicked);
-    connect(ui.Generate, &QAction::triggered, this, &SubDesignT1::on_Generate_triggered);
+    //connect(ui.ShellSort, &QPushButton::clicked, this, &SubDesignT1::on_ShellSort_clicked);
+    //connect(ui.QuickSort, &QPushButton::clicked, this, &SubDesignT1::on_QuickSort_clicked);
+    //connect(ui.HeapSort, &QPushButton::clicked, this, &SubDesignT1::on_HeapSort_clicked);
+    //connect(ui.MergeSort, &QPushButton::clicked, this, &SubDesignT1::on_MergeSort_clicked);
+  /*  connect(ui.Generate, &QAction::triggered, this, &SubDesignT1::on_Generate_triggered);
     connect(ui.Open, &QAction::triggered, this, &SubDesignT1::on_Open_triggered);
-    connect(ui.Save, &QAction::triggered, this, &SubDesignT1::on_Save_triggered);
+    connect(ui.Save, &QAction::triggered, this, &SubDesignT1::on_Save_triggered);*/
 	connect(ui.Set, &QAction::triggered, this, &SubDesignT1::showSettingDialog);
 
 	dataSize = 0;
